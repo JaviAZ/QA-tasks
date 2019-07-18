@@ -1,0 +1,13 @@
+idbooks,idauthors,title,start_date,published,stock_sold
+1,4,"The Fellowship of the Ring",1990-06-01,1,2189
+2,4,"The Two Towers",1994-11-05,1,2249
+3,4,"The Return of the King",1998-06-20,1,2600
+4,1,It,1999-01-01,1,1423
+5,1,"The Shinning",1998-04-12,1,1190
+6,1,"The Green Mile",1994-02-22,1,987
+7,2,"Harry Potter and the Philosophers Stone",1990-05-12,1,2200
+8,2,"Harry Potter and the Chamber of Secrets",1993-01-13,1,2560
+9,2,"Harry Potter and the Prisoner of Azkaban",2009-05-05,0,0
+10,3,"A Game of Thrones",1991-06-16,1,1640
+11,3,"A Clash of Kings",1996-02-03,1,1945
+12,3,"A Storm of Swords",2004-08-16,0,0
