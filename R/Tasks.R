@@ -188,7 +188,6 @@ salaryPredsTrain <- function(){
   agesAbove50<- c(agesVSsalary[,2])
   educAbove50<- c(educVSsalary[,2])
   
-  return (train)
  
 }
 salaryPredsTest<- function(train){
