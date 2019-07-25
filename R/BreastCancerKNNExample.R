@@ -4,7 +4,7 @@ library(ggplot2)
 RawBCD <- read.table("BreastCancerData.data", sep=",")
 colnames(RawBCD) <- c("id", "result", "meanRadius", "meanTexture", "meanPerimeter","meanArea",
                       "meanSmoothness","meanCompactness","meanConcativity","meanConcavePoints",
-                      "meanSymmetry","meanFractalDimension","seRadius","seTexture","meanPerimeter",
+                      "meanSymmetry","meanFractalDimension","seRadius","seTexture","sePerimeter",
                       "seArea","seSmoothness","seCompactness","seConcativity",
                       "seConcavePoints","seSymmetry","seFractalDimension","worstRadius",
                       "worstTexture","meanPerimeter","worstArea","worstSmoothness","worstCompactness",
@@ -28,7 +28,6 @@ BCD_Test  <- BCD_Normalised[451:569,]
 
 #Compute k-value to use with the classifier. Rule of thumb is square root of n of observations
 k_value <- floor(sqrt(length(BCD_Train[,1])))
-
 #Now use KNN Algorithm in class package to classify data
 BCD_Predictions <- knn(BCD_Train, BCD_Test, BCD_Noid[1:450,1], k=k_value)
 
@@ -39,10 +38,4 @@ BCD_Reference <- BCD_Noid[451:569,1]
 #Compare results
 #Performance shown as TP,FP/FN,TN
 table(BCD_Predictions,BCD_Reference)
-
-
-
-
-
-
 

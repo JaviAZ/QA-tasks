@@ -1,3 +1,10 @@
+library(rpart)
+install.packages('rattle')
+install.packages('rpart.plot')
+install.packages('RColorBrewer')
+library(rattle)
+library (rpart.plot)
+library(RColorBrewer)
 condi <- function(x, y){
   if(x == 0){
     return (y)
