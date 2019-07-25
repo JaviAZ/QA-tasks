@@ -87,8 +87,6 @@
 
 * .PDF file with exercises
 
-* .RData and .Rhistory files from R Studio
-
 * .R files with R Scripts
 
 * .CSV and .data files with tables for Data Frames
