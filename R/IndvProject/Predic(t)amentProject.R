@@ -99,8 +99,8 @@ cleanData <- function(){
   allData$Fence<- factor(allData$Fence, levels = c("MnWw","MnPrv","GdWo","GdPrv"), 
                           labels = c(1,2,3,4),
                           ordered = TRUE)
-  boxplot(allData$SalePrice ~ allData$Fence)
-  summary(lm(as.numeric(allData$Fence) ~ allData$SalePrice, data = allData))
+  boxplot(allData$SalePrice ~ allData$ExterQual)
+  summary(lm(as.numeric(allData$ExterQual) ~ allData$SalePrice, data = allData))
 
 }
 
@@ -196,7 +196,7 @@ InverseFeatureScalling <- function(x) {
 }
 
 ThirdPredictAttempt <- function(){
-  #allData = read.csv("train.csv")
+  allData = read.csv("train.csv")
   allData <- subset(allData, select=c(SalePrice,OverallQual,GrLivArea,ExterQual,KitchenQual,BsmtQual,GarageCars,GarageArea,TotalBsmtSF,X1stFlrSF,FullBath))
   allData <- na.omit(allData)
   allData_Normalised <- as.data.frame(lapply(allData[,2:length(allData)], FeatureScalling))
@@ -212,10 +212,10 @@ ThirdPredictAttempt <- function(){
   #Compare results
   #Performance shown as TP,FP/FN,TN
   #table(predictions,reference)
-  accuracy <- sum(round(as.numeric(as.character(predictions)),digit = -3)==round(as.numeric(reference),digit=-3))/length(predictions)
+  accuracy <- sum(round(as.numeric(as.character(predictions)),digit = -4)==round(as.numeric(reference),digit=-4))/length(predictions)
   all.equal(as.numeric(as.character(predictions)),as.numeric(reference))
   print(accuracy)
-  mdl <- lm(round(as.numeric(as.character(predictions)),digit = -3) ~ round(as.numeric(reference),digit=-3))
+  mdl <- lm(round(as.numeric(as.character(predictions)),digit = -4) ~ round(as.numeric(reference),digit=-4))
   summary(mdl)
   
 #  accuracySum <- c()
