@@ -1,4 +1,4 @@
-importLibraries <- function (){
+importLibrariesAndDB <- function (){
   setwd("C:/Users/Admin/Desktop/QAExercises/R/IndvProject")
   install.packages('rattle')
   install.packages('rpart.plot')
@@ -10,16 +10,16 @@ importLibraries <- function (){
   library(RColorBrewer)
   library(class)
   library(kknn)
+  localuserpassword <- "root"
+  PredictamentDB <- dbConnect(RMariaDB::MariaDB(), user='root', password=localuserpassword, dbname='predic(t)amentdb', host='localhost')
+  dbListTables(PredictamentDB)
+  query <- "SELECT * FROM train_data;"
+  allData <- dbFetch(dbSendQuery(PredictamentDB, query))
+  dbDisconnect(PredictamentDB)
+  return(allData)
 }
+
 options(scipen=999)
-
-localuserpassword <- "root"
-PredictamentDB <- dbConnect(RMariaDB::MariaDB(), user='root', password=localuserpassword, dbname='predic(t)amentdb', host='localhost')
-dbListTables(PredictamentDB)
-query <- "SELECT * FROM train_data;"
-allData <- dbFetch(dbSendQuery(PredictamentDB, query))
-dbDisconnect(PredictamentDB)
-
 
 cleanData <- function(){
   allData = read.csv("train.csv")
@@ -136,6 +136,8 @@ FiftPredictAttempt <- function(){
   print(summary(predicty))
   print(summary(testingData[,1]))
 }
+
+allData <- importLibrariesAndDB()
 
 cleanData()
 ExportRPFVals()
