@@ -1,4 +1,5 @@
 importLibraries <- function (){
+  setwd("C:/Users/Admin/Desktop/QAExercises/R/IndvProject")
   install.packages('rattle')
   install.packages('rpart.plot')
   install.packages('RColorBrewer')
