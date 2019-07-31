@@ -1,4 +1,5 @@
 importLibraries <- function (){
+  setwd("C:/Users/Admin/Desktop/QAExercises/R/IndvProject")
   install.packages('rattle')
   install.packages('rpart.plot')
   install.packages('RColorBrewer')
@@ -12,7 +13,13 @@ importLibraries <- function (){
 }
 options(scipen=999)
 
-allData = read.csv("train.csv")
+localuserpassword <- "root"
+PredictamentDB <- dbConnect(RMariaDB::MariaDB(), user='root', password=localuserpassword, dbname='predic(t)amentdb', host='localhost')
+dbListTables(PredictamentDB)
+query <- "SELECT * FROM train_data;"
+allData <- dbFetch(dbSendQuery(PredictamentDB, query))
+dbDisconnect(PredictamentDB)
+
 
 cleanData <- function(){
   allData = read.csv("train.csv")
