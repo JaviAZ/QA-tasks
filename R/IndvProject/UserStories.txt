@@ -1,0 +1,13 @@
+As an estate agent, I want to predict the price of a given house, so that I
+can market it at a good price.
+
+As an estate agent, I want to add homes to the application, so that
+customers can see them.
+
+As a customer, I want to browse the selection of homes, so that I can rent
+or buy.
+
+As a customer, I want to know how to contact the letting agent, so that I
+can arrange a viewing.
+
+As a clerk, I want to access tenant records, so that I can audit stored data.
