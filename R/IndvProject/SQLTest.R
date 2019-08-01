@@ -2,7 +2,7 @@ install.packages("RMariaDB")
 library(RMariaDB)
 
 #cmd csv to mysql:
-#mysqlimport --columns='head -n 1 trainfordb.csv' --ignore-lines=1 "predic(t)amentdb" trainfordb.csv -u root -p root
+#mysqlimport --columns='head -n 1 trainfordb.csv' --ignore-lines=1 predictamentdb trainfordb.csv -u root -p root
 
 
 localuserpassword <- "root"

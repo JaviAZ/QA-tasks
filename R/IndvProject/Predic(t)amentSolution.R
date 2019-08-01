@@ -1,17 +1,21 @@
 importLibrariesAndDB <- function (){
-  setwd("C:/Users/Admin/Desktop/QAExercises/R/IndvProject")
-  install.packages('rattle')
-  install.packages('rpart.plot')
-  install.packages('RColorBrewer')
-  install.packages('kknn')
+  #setwd("C:/Users/Admin/Desktop/QAExercises/R/IndvProject")
+  #install.packages('rattle')
+  #install.packages('rpart.plot')
+  #install.packages('RColorBrewer')
+  #install.packages('kknn')
+  #install.packages("RMariaDB")
+  #install.packages("shiny")
   library(rpart)
   library(rattle)
   library (rpart.plot)
   library(RColorBrewer)
   library(class)
   library(kknn)
+  library(RMariaDB)
+  library(shiny)
   localuserpassword <- "root"
-  PredictamentDB <- dbConnect(RMariaDB::MariaDB(), user='root', password=localuserpassword, dbname='predic(t)amentdb', host='localhost')
+  PredictamentDB <- dbConnect(RMariaDB::MariaDB(), user='root', password=localuserpassword, dbname='predictamentdb', host='localhost')
   dbListTables(PredictamentDB)
   query <- "SELECT * FROM train_data;"
   allData <- dbFetch(dbSendQuery(PredictamentDB, query))
@@ -22,7 +26,6 @@ importLibrariesAndDB <- function (){
 options(scipen=999)
 
 cleanData <- function(){
-  allData = read.csv("train.csv")
   allData$ExterQual<- factor(allData$ExterQual, levels = c("Po","Fa","TA","Gd","Ex"), 
                              labels = c(1,2,3,4,5),
                              ordered = TRUE)
@@ -77,6 +80,7 @@ cleanData <- function(){
   allData$Fence<- factor(allData$Fence, levels = c("MnWw","MnPrv","GdWo","GdPrv"), 
                          labels = c(1,2,3,4),
                          ordered = TRUE)
+  return(allData)
 }
 
 ExportRPFVals <- function(){
@@ -105,10 +109,8 @@ FeatureScalling <- function(x) {
 
 #BEST ATTEMPT KKNN (Weighted knn)
 FiftPredictAttempt <- function(){
-  #Import Data
-  allData = read.csv("train.csv")
   #Normalise Data
-  allData <- subset(allData, select=c(SalePrice,OverallQual,GrLivArea,ExterQual,KitchenQual,BsmtQual,GarageCars,GarageArea,TotalBsmtSF,X1stFlrSF,FullBath,TotRmsAbvGrd,YearBuilt))
+  allData <- subset(allData, select=c(SalePrice,OverallQual,GrLivArea,ExterQual,KitchenQual,BsmtQual,GarageCars,TotalBsmtSF,X1stFlrSF,FullBath,TotRmsAbvGrd,YearBuilt))
   allData <- na.omit(allData)
   allData_Normalised <- cbind(allData[,1], as.data.frame(lapply(allData[,-1], FeatureScalling)))
   colnames(allData_Normalised) <- c("SalePrice", colnames(allData_Normalised[,-1]))
@@ -138,7 +140,46 @@ FiftPredictAttempt <- function(){
 }
 
 allData <- importLibrariesAndDB()
-
-cleanData()
-ExportRPFVals()
+allData <- cleanData()
 FiftPredictAttempt()
+
+#Design UI
+ui <- fluidPage(
+  titlePanel("Hello Shiny!"),
+  fluidRow(
+    column(2,
+      selectInput(inputId = "OverallQual", label = "Overal Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
+    column(2,
+      selectInput(inputId = "ExterQual", label = "Exterior Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
+    column(3,
+      selectInput(inputId = "KitchenQual", label = "Kitchen Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
+      selectInput(inputId = "BsmtQual", label = "Basement Quality", choices = c("Excellent","Good","Typical","Average","Fair","Poor","No Basement")),
+      textInput(inputId = "GrLivArea", label = "Above ground living area square feet", value = 0),
+      textInput(inputId = "TotalBsmtSF", label = "Basement area square feet", value = 0),
+      textInput(inputId = "X1stFlrSF", label = "1st floor area square feet", value = 0),
+      textInput(inputId = "YearBuilt", label = "Original construction date", value = 0),
+      sliderInput(inputId = "GarageCars", label = "Garage car capacity",min = 0, max = 10, value = 0),
+      sliderInput(inputId = "FullBath", label = "Bathrooms above ground",min = 0, max = 10, value = 0),
+      sliderInput(inputId = "TotRmsAbvGrd", label = "Rooms above ground (not including bathrooms",min = 0, max = 20, value = 0)
+    ),
+    mainPanel(
+      textOutput(outputId = "Predicted"),
+      plotOutput(outputId =  "Ploty")
+    )
+)
+
+cleverCleverLogic <- function(input){
+  bedsValue <- input$beds*100000
+  toiletsValue <- input$toilets*50000
+  storiesValue <- (as.numeric(input$stories)-1)*50000
+  value <- (bedsValue + toiletsValue + storiesValue)
+  return(value)
+}
+
+server <- function(input,output){
+  output$Predicted <- renderText({
+    paste("Predicted Value of \U00A3", 300)
+  })
+}
+
+shinyApp(ui = ui, server = server)
