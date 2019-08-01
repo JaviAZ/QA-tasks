@@ -1,0 +1,19 @@
+HIVE QUERIES
+
+CREATE DATABASE dbee;
+USE dbee;
+CREATE EXTERNAL TABLE users(id INT,age INT,gender STRING,occupation STRING,zipCode INT) 
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY "|" 
+STORED AS TEXTFILE 
+LOCATION '/userInfoDir';
+SELECT COUNT(id) FROM users WHERE occupation = "student";
+------------------------------
+HDFS COMMANDS
+
+Create folder: hdfs dfs -mkdir /userInfoDir
+View all files/folders: hdfs dfs -ls /
+Put file into folder:  hdfs dfs -put  Desktop/ml-100k/u.user /userInfoDir
+View content of folder: hdfs dfs -ls /userInfoDir
+View content of file: hdfs dfs -cat /userInfoDir/u.user
+-------------------------------
