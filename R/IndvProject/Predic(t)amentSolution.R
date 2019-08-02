@@ -1,11 +1,9 @@
 importLibrariesAndDB <- function (){
-  #setwd("C:/Users/Admin/Desktop/QAExercises/R/IndvProject")
-  #install.packages('rattle')
-  #install.packages('rpart.plot')
-  #install.packages('RColorBrewer')
-  #install.packages('kknn')
-  #install.packages("RMariaDB")
-  #install.packages("shiny")
+  required_packages <- c('rattle','rpart.plot','RColorBrewer','kknn','RMariaDB','shiny','plyr') #Every package your script needs
+  new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])] #Get all the ones not already installed
+  if(length(new_packages >= 1)){
+    install.packages(new_packages) #Install all packages not already installed
+  }
   library(rpart)
   library(rattle)
   library (rpart.plot)
@@ -14,6 +12,7 @@ importLibrariesAndDB <- function (){
   library(kknn)
   library(RMariaDB)
   library(shiny)
+  library (plyr)
   localuserpassword <- "root"
   PredictamentDB <- dbConnect(RMariaDB::MariaDB(), user='root', password=localuserpassword, dbname='predictamentdb', host='localhost')
   dbListTables(PredictamentDB)
@@ -25,62 +24,47 @@ importLibrariesAndDB <- function (){
 
 options(scipen=999)
 
-cleanData <- function(){
-  allData$ExterQual<- factor(allData$ExterQual, levels = c("Po","Fa","TA","Gd","Ex"), 
-                             labels = c(1,2,3,4,5),
-                             ordered = TRUE)
-  allData$ExterCond<- factor(allData$ExterCond, levels = c("Po","Fa","TA","Gd","Ex"), 
-                             labels = c(1,2,3,4,5),
-                             ordered = TRUE)
-  allData$BsmtQual<- factor(allData$BsmtQual, levels = c("Po","Fa","TA","Gd","Ex"), 
-                            labels = c(1,2,3,4,5),
-                            ordered = TRUE)
-  allData$BsmtCond<- factor(allData$BsmtCond, levels = c("Po","Fa","TA","Gd","Ex"), 
-                            labels = c(1,2,3,4,5),
-                            ordered = TRUE)
-  allData$BsmtExposure<- factor(allData$BsmtExposure, levels = c("No","Mn","Av","Gd"), 
-                                labels = c(1,2,3,4),
-                                ordered = TRUE)
-  allData$BsmtFinType1<- factor(allData$BsmtFinType1, levels = c("Unf","Lwq","Rec","BLQ","ALQ","GLQ"), 
-                                labels = c(1,2,3,4,5,6),
-                                ordered = TRUE)
-  allData$BsmtFinType2<- factor(allData$BsmtFinType2, levels = c("Unf","Lwq","Rec","BLQ","ALQ","GLQ"), 
-                                labels = c(1,2,3,4,5,6),
-                                ordered = TRUE)
-  allData$HeatingQC<- factor(allData$HeatingQC, levels = c("Po","Fa","TA","Gd","Ex"), 
-                             labels = c(1,2,3,4,5),
-                             ordered = TRUE)
-  allData$CentralAir<- factor(allData$CentralAir, levels = c("N","Y"), 
-                              labels = c(0,1),
-                              ordered = TRUE)
-  allData$KitchenQual<- factor(allData$KitchenQual, levels = c("Po","Fa","TA","Gd","Ex"), 
-                               labels = c(1,2,3,4,5),
-                               ordered = TRUE)
-  allData$Functional<- factor(allData$Functional, levels = c("Sal","Sev","Maj2","Maj1","Mod","Min2","Min1","Typ"), 
-                              labels = c(1,2,3,4,5,6,7,8),
-                              ordered = TRUE)
-  allData$FireplaceQu<- factor(allData$FireplaceQu, levels = c("Po","Fa","TA","Gd","Ex"), 
-                               labels = c(1,2,3,4,5),
-                               ordered = TRUE)
-  allData$GarageFinish<- factor(allData$GarageFinish, levels = c("Unf","RFn","Fin"), 
-                                labels = c(1,2,3),
-                                ordered = TRUE)
-  allData$GarageQual<- factor(allData$GarageQual, levels = c("Po","Fa","TA","Gd","Ex"), 
-                              labels = c(1,2,3,4,5),
-                              ordered = TRUE)
-  allData$GarageCond<- factor(allData$GarageCond, levels = c("Po","Fa","TA","Gd","Ex"), 
-                              labels = c(1,2,3,4,5),
-                              ordered = TRUE)
-  allData$PavedDrive<- factor(allData$PavedDrive, levels = c("N","P","Y"), 
-                              labels = c(1,2,3),
-                              ordered = TRUE)
-  allData$PoolQC<- factor(allData$PoolQC, levels = c("Po","Fa","TA","Gd","Ex"), 
-                          labels = c(1,2,3,4,5),
-                          ordered = TRUE)
-  allData$Fence<- factor(allData$Fence, levels = c("MnWw","MnPrv","GdWo","GdPrv"), 
-                         labels = c(1,2,3,4),
-                         ordered = TRUE)
-  return(allData)
+cleanData <- function(dat){
+  if(length(dat) == 81){
+    dat$CentralAir<- factor(dat$CentralAir, levels = c("N","Y"), labels = c(0,1), ordered = TRUE)
+    dat$PavedDrive<- factor(dat$PavedDrive, levels = c("N","P","Y"), labels = c(1,2,3), ordered = TRUE)
+    dat$ExterCond<- factor(dat$ExterCond, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+    dat$BsmtCond<- factor(dat$BsmtCond, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+    dat$HeatingQC<- factor(dat$HeatingQC, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+    dat$GarageQual<- factor(dat$GarageQual, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+    dat$GarageCond<- factor(dat$GarageCond, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+    dat$FireplaceQu<- factor(dat$FireplaceQu, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+    dat$PoolQC<- factor(dat$PoolQC, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+    dat$BsmtFinType1<- factor(dat$BsmtFinType1, levels = c("Unf","Lwq","Rec","BLQ","ALQ","GLQ"), labels = c(1,2,3,4,5,6), ordered = TRUE)
+    dat$BsmtFinType2<- factor(dat$BsmtFinType2, levels = c("Unf","Lwq","Rec","BLQ","ALQ","GLQ"), labels = c(1,2,3,4,5,6), ordered = TRUE)
+    dat$BsmtExposure<- factor(dat$BsmtExposure, levels = c("No","Mn","Av","Gd"), labels = c(1,2,3,4), ordered = TRUE)
+    dat$GarageFinish<- factor(dat$GarageFinish, levels = c("Unf","RFn","Fin"), labels = c(1,2,3), ordered = TRUE)
+    dat$Fence<- factor(dat$Fence, levels = c("MnWw","MnPrv","GdWo","GdPrv"), labels = c(1,2,3,4), ordered = TRUE)
+    dat$Functional<- factor(dat$Functional, levels = c("Sal","Sev","Maj2","Maj1","Mod","Min2","Min1","Typ"), labels = c(1,2,3,4,5,6,7,8), ordered = TRUE)
+  }else{
+    if(dat$ExterQual == "Excellent") dat$ExterQual <- "Ex"
+    if(dat$ExterQual == "Good") dat$ExterQual <- "Gd"
+    if(dat$ExterQual == "Average") dat$ExterQual <- "TA"
+    if(dat$ExterQual == "Fair") dat$ExterQual <- "Fa"
+    if(dat$ExterQual == "Poor") dat$ExterQual <- "Po"
+    if(dat$BsmtQual == "Excellent") dat$BsmtQual <- "Ex"
+    if(dat$BsmtQual == "Good") dat$BsmtQual <- "Gd"
+    if(dat$BsmtQual == "Typical") dat$BsmtQual <- "TA"
+    if(dat$BsmtQual == "Fair") dat$BsmtQual <- "Fa"
+    if(dat$BsmtQual == "Poor") dat$BsmtQual <- "Po"
+    if(dat$BsmtQual == "No Basement") dat$BsmtQual <- "TA"
+    if(dat$KitchenQual == "Excellent") dat$KitchenQual <- "Ex"
+    if(dat$KitchenQual == "Good") dat$KitchenQual <- "Gd"
+    if(dat$KitchenQual == "Average") dat$KitchenQual <- "TA"
+    if(dat$KitchenQual == "Fair") dat$KitchenQual <- "Fa"
+    if(dat$KitchenQual == "Poor") dat$KitchenQual <- "Po"
+  }
+  dat$ExterQual<- factor(dat$ExterQual, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+  dat$BsmtQual<- factor(dat$BsmtQual, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+  dat$KitchenQual<- factor(dat$KitchenQual, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
+
+  
+  return(dat)
 }
 
 ExportRPFVals <- function(){
@@ -107,79 +91,82 @@ FeatureScalling <- function(x) {
   return((x-min(x))/(max(x)-min(x))) 
 }
 
-#BEST ATTEMPT KKNN (Weighted knn)
-FiftPredictAttempt <- function(){
+normaliseData <- function(dat){
   #Normalise Data
-  allData <- subset(allData, select=c(SalePrice,OverallQual,GrLivArea,ExterQual,KitchenQual,BsmtQual,GarageCars,TotalBsmtSF,X1stFlrSF,FullBath,TotRmsAbvGrd,YearBuilt))
-  allData <- na.omit(allData)
-  allData_Normalised <- cbind(allData[,1], as.data.frame(lapply(allData[,-1], FeatureScalling)))
-  colnames(allData_Normalised) <- c("SalePrice", colnames(allData_Normalised[,-1]))
-  #Compute k-value to use with the classifier. Rule of thumb is square root of n of observations
-  k_value <- floor(sqrt(length(allData_Normalised[,1])))
-  #Split data into testing and training data
-  sampleRows <- sample(1:1423, 350)
-  testingData <- allData_Normalised[sampleRows, ]
-  trainingData <- allData_Normalised[-sampleRows, ]
-  #Train weighted KNN Algorithm and test against testing results
-  model <- train.kknn(formula = SalePrice~., data=trainingData, kmax = k_value, kernel = "optimal")
-  predicty <- predict(model, testingData[, -1])
-  #Linear model of prediction vs real result
-  mdl <- lm(predicty ~ testingData[, 1])
-  #Plot prediction against real result with a trendline and a y=x line for comparison
-  plot(predicty,testingData[,1])
-  abline(mdl)
-  x = c(0,0.3,0.8)
-  y = c(0,0.3,0.8)
-  par(new=T)
-  plot(x,y,type="l")
-  #Print summary for model, prediction and real data. And find Mean Relative Difference between prediction and real data
-  print(summary(mdl))
-  print(all.equal(testingData[, 1],predicty))
-  print(summary(predicty))
-  print(summary(testingData[,1]))
+  Dat_Normalised <- subset(dat, select=c(SalePrice,OverallQual,GrLivArea,ExterQual,KitchenQual,BsmtQual,GarageCars,TotalBsmtSF,X1stFlrSF,FullBath,TotRmsAbvGrd,YearBuilt))
+  Dat_Normalised <- na.omit(Dat_Normalised)
+  #Dat_Normalised <- cbind(Dat_Normalised[,1], as.data.frame(lapply(Dat_Normalised[,-1], FeatureScalling)))
+  #colnames(Dat_Normalised) <- c("SalePrice", colnames(Dat_Normalised[,-1]))
+  return(Dat_Normalised)
 }
-
-allData <- importLibrariesAndDB()
-allData <- cleanData()
-FiftPredictAttempt()
 
 #Design UI
 ui <- fluidPage(
-  titlePanel("Hello Shiny!"),
-  fluidRow(
-    column(2,
-      selectInput(inputId = "OverallQual", label = "Overal Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
-    column(2,
-      selectInput(inputId = "ExterQual", label = "Exterior Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
-    column(3,
-      selectInput(inputId = "KitchenQual", label = "Kitchen Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
-      selectInput(inputId = "BsmtQual", label = "Basement Quality", choices = c("Excellent","Good","Typical","Average","Fair","Poor","No Basement")),
-      textInput(inputId = "GrLivArea", label = "Above ground living area square feet", value = 0),
-      textInput(inputId = "TotalBsmtSF", label = "Basement area square feet", value = 0),
-      textInput(inputId = "X1stFlrSF", label = "1st floor area square feet", value = 0),
-      textInput(inputId = "YearBuilt", label = "Original construction date", value = 0),
-      sliderInput(inputId = "GarageCars", label = "Garage car capacity",min = 0, max = 10, value = 0),
-      sliderInput(inputId = "FullBath", label = "Bathrooms above ground",min = 0, max = 10, value = 0),
-      sliderInput(inputId = "TotRmsAbvGrd", label = "Rooms above ground (not including bathrooms",min = 0, max = 20, value = 0)
-    ),
+  titlePanel("Predic(t)ament!"),
+  sidebarPanel(
+    fluidRow(
+      column(2,
+             sliderInput(inputId = "OverallQual", label = "Overal Quality",min = 0, max = 10, value = 5)),
+      column(2,
+        selectInput(inputId = "ExterQual", label = "Exterior Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
+      column(3,
+        selectInput(inputId = "KitchenQual", label = "Kitchen Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
+      column(3,
+        selectInput(inputId = "BsmtQual", label = "Basement Quality", choices = c("Excellent","Good","Typical","Fair","Poor","No Basement")))
+      ),
+    fluidRow(
+      column(3,
+        textInput(inputId = "GrLivArea", label = "Above ground living area square feet", value = 2423)),
+      column(3,
+        textInput(inputId = "TotalBsmtSF", label = "Basement area square feet", value = 1234)),
+      column(3,
+        textInput(inputId = "X1stFlrSF", label = "1st floor area square feet", value = 1342)),
+      column(3,
+        textInput(inputId = "YearBuilt", label = "Original construction date", value = 1997))
+      ),
+    fluidRow(
+      column(3,
+        sliderInput(inputId = "GarageCars", label = "Garage car capacity",min = 0, max = 10, value = 2)),
+      column(3,
+        sliderInput(inputId = "FullBath", label = "Bathrooms above ground",min = 0, max = 10, value = 2)),
+      column(3,
+        sliderInput(inputId = "TotRmsAbvGrd", label = "Rooms above ground (not including bathrooms",min = 1, max = 20, value = 0))
+      ),
+    width = 20),
     mainPanel(
       textOutput(outputId = "Predicted"),
-      plotOutput(outputId =  "Ploty")
+      submitButton("Check price")
     )
 )
 
 cleverCleverLogic <- function(input){
-  bedsValue <- input$beds*100000
-  toiletsValue <- input$toilets*50000
-  storiesValue <- (as.numeric(input$stories)-1)*50000
-  value <- (bedsValue + toiletsValue + storiesValue)
-  return(value)
+  #inp <- list("OverallQual"=6,"GrLivArea"=1800,"ExterQual"="Excellent","KitchenQual"="Good","BsmtQual"="Good","GarageCars"=2,
+  #            "TotalBsmtSF"=800,"X1stFlrSF"=800,"FullBath"=2,"TotRmsAbvGrd"=5,"YearBuilt"=1997)
+  inp <- list("OverallQual"=input$OverallQual,"GrLivArea"=as.numeric(input$GrLivArea),"ExterQual"=input$ExterQual,
+              "KitchenQual"=input$KitchenQual,"BsmtQual"=input$BsmtQual,"GarageCars"=as.numeric(input$GarageCars),
+              "TotalBsmtSF"=as.numeric(input$TotalBsmtSF),"X1stFlrSF"=as.numeric(input$X1stFlrSF),
+              "FullBath"=as.numeric(input$FullBath),"TotRmsAbvGrd"=as.numeric(input$TotRmsAbvGrd),
+              "YearBuilt"=as.numeric(input$YearBuilt))
+  #Compute k-value to use with the classifier. Rule of thumb is square root of n of observations
+  k_value <- floor(sqrt(length(allData_Normalised[,1])))
+  #Split data into testing and training data
+  testingData <- data.frame(inp)
+  testingData <- cleanData(testingData)
+  trainingData <- allData_Normalised[,]
+  print(testingData)
+  #Train weighted KNN Algorithm and test against testing results
+  model <- train.kknn(formula = SalePrice~., data=trainingData, kmax = k_value, kernel = "optimal")
+  predicty <- predict(model, testingData)
+  return(round(predicty,-3))
 }
 
 server <- function(input,output){
   output$Predicted <- renderText({
-    paste("Predicted Value of \U00A3", 300)
+    paste("Predicted Value of \U00A3", cleverCleverLogic(input))
   })
 }
 
+allData <- importLibrariesAndDB()
+allData <- cleanData(allData)
+allData_Normalised <- normaliseData(allData)
 shinyApp(ui = ui, server = server)
