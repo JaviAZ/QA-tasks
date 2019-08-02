@@ -25,6 +25,8 @@ cleverCleverLogic <- function(input){
   toiletsValue <- input$toilets*50000
   storiesValue <- (as.numeric(input$stories)-1)*50000
   value <- (bedsValue + toiletsValue + storiesValue)
+  
+  print(typeof(input))
   return(value)
 }
 
