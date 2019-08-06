@@ -1,0 +1,53 @@
+/etc 	user accounts and passwords
+~		home directory
+
+Variables are stored in session
+
+Anatomy of command
+	ls				-ls			--color		/home/bobby
+	command   short option   long option   object(s)
+
+Useful commands
+	ls 						List content of directory
+		-l long
+		-a all
+	mv 						Move file or directory (also used to rename)
+		-i ask user input for each file
+		-f force movement
+	cp 						Copy file or directory
+		-r recursive (essential for directories)
+	rm 						Remove file or directory (forever)
+		-r recursive (essential for directories)
+	compgen -c				List all available commands
+
+File name shorthands
+	* 		-> 0 or more characters
+	? 		-> 1 character
+	[abc] 	-> a character either a, b, or c
+	[a-z]	-> a character between A and Z
+	[!abc]	-> any character but a, b, and c
+Shell character classes (in ksh and bash)
+	[[:alnum:]] "alnum" can be changed to alpha, digit, lower, upper, punct, lower
+
+Scripts
+	Log_file=mylog1			no spaces around "="
+	echo $Log_file			prints variable content
+	echo $(uname -r)		prints (executed thanks to brakets) command content
+
+Permisions
+	type user group other
+	   0 123   456  789
+	   - rwx   rwx  rwx		- File; d Directory; l link
+	   d
+	   l
+	$ chmod 774 filename
+	$ chmod
+
+Inodes
+	ls -i 					for list of inodes
+	metadata for each file with pointers
+	$ stat myfile			for info/inode
+
+Links
+	$ ln source target 			Hard link is a back up of a file
+	$ ln -s source directory 	Symbolic link points to a file
