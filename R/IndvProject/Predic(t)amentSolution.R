@@ -153,7 +153,6 @@ cleverCleverLogic <- function(input){
   testingData <- data.frame(inp)
   testingData <- cleanData(testingData)
   trainingData <- allData_Normalised[,]
-  print(testingData)
   #Train weighted KNN Algorithm and test against testing results
   model <- train.kknn(formula = SalePrice~., data=trainingData, kmax = k_value, kernel = "optimal")
   predicty <- predict(model, testingData)
