@@ -1,24 +1,42 @@
-/etc 	user accounts and passwords
-~		home directory
+/etc/passwd 	user info
+~				home directory
+edit .bashrc in home to export PATH to use scripts anywhere
 
 Variables are stored in session
 
 Anatomy of command
-	ls				-ls			--color		/home/bobby
+	$ ls		-ls			--color			/home/bobby
 	command   short option   long option   object(s)
 
 Useful commands
-	ls 						List content of directory
+	$ ls					List content of directory
 		-l long
 		-a all
-	mv 						Move file or directory (also used to rename)
+	$ mv					Move file or directory (also used to rename)
 		-i ask user input for each file
 		-f force movement
-	cp 						Copy file or directory
+	$ cp					Copy file or directory
 		-r recursive (essential for directories)
-	rm 						Remove file or directory (forever)
+	$ rm 					Remove file or directory (forever)
 		-r recursive (essential for directories)
-	compgen -c				List all available commands
+	$ cut 					cuts output of command depending on short options
+		-d'delimeter' 
+		-f'fields wanted'
+	$ sort 					sorts output of command
+		-n numeric
+		-r reverse
+	$ uniq 					get rid off duplicates (depends on flag)
+		-u only unique values
+		-d only duplicate values
+	$ set 					display all vars
+		-o option			turn on option
+		+o option			turn off option
+	$ env 					display all vars in environment
+	$ unset 					remove variable
+	$ stat /dir /file 		show stats of file or directory
+	$ who
+	$ whoami
+	$ compgen -c			List all available commands
 
 File name shorthands
 	* 		-> 0 or more characters
@@ -30,15 +48,19 @@ Shell character classes (in ksh and bash)
 	[[:alnum:]] "alnum" can be changed to alpha, digit, lower, upper, punct
 
 Scripts
-	Log_file=mylog1			no spaces around "="
-	echo ${Log_file}		prints variable content
-	echo $(uname -r)		prints (executed thanks to brakets) command content
+	$# $1 $2 $3 				$number for arguements $# number of arguements
+	Log_file=mylog1				no spaces around "="
+	${#varName}					length of variable
+	declare -a arrayVar=(1,2)	create array variable 
+	echo ${Log_file}			prints variable content
+	echo $(uname -r)			prints (executed thanks to brakets) command content
 	if (( ${x} % 2 == 0 ))	if [ ${str1} == ${str2} ]	if [ ${x} -gt ${y} ]
 	case word in
-		pattern )
-			;;
+		pattern) somethingToDo;
+				 anotherThingToDo;;
+		*)		 defaultThingToDo;;
 	esac
-	for i in "${array[@]}"	for i in seq(1,${max})
+	for i in "${array[@]}"	for i in seq(1,${max})	for i in $@
 	while [ condition ]
 
 Permisions
@@ -47,8 +69,10 @@ Permisions
 	   - rwx   rwx  rwx		- File; d Directory; l link
 	   d
 	   l
-	$ chmod 774 filename
-	$ chmod
+	$ chmod [-R] 774 filename
+	$ chmod [-R] -ugo=rwx
+	$ chown [-R] user file 		change owner of file (user:group) to change owner and group
+	$ chgrp [-R] group file 	change only group of file
 
 Inodes
 	ls -i 					for list of inodes
@@ -58,3 +82,18 @@ Inodes
 Links
 	$ ln source target 			Hard link is a back up of a file
 	$ ln -s source directory 	Symbolic link points to a file
+
+Fact finding
+	$ ps 						Shows active processes
+	$ wc -l -w 					count lines, words, etc
+	$ grep 						Show only lines that follow a pattern
+	$ history
+	$ !n nth command 	!-n nth previous command 	!prefix last command starting with prefix 	!1258:s/upper/lower/ get command 1258 and substitute upper with lower
+
+Redirecting standard output/error/input
+	command > file 				output result from command into file (overwrites)
+	command >> file 			output result from command into file (appends)
+	command 2> file 			output result from command into file (only if error is thrown)
+	command < file 				input filename into command, command then looks for file (end with ^D)
+	command << result			user input that ends with the name called "result", only shown temporary
+	who | tee -a wholist | wc -l 	output "who" result into file "wholist" as well as piping to wc -l
