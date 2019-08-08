@@ -1,0 +1,162 @@
+Linux Assessment Rework
+-----------------------
+
+	This assessment will be a 'living answer'. Each question's answer will feed as the structure for the next question. 
+	For example, question 1 may ask you to write a script that will create some directories and files. Question 2 may then go on to ask you to write a script that will manipulate the directories/files. Question 3 may then go on to ask you to use the manipulated files as inputs to more commands.
+
+	Each script should be named according to the task they satisfy:
+		t1.sh
+		t2.sh
+		...
+
+	All 't*.sh' script should be placed in:
+		/home/user001/answers
+
+
+	FIZZBUZZ
+	--------
+
+		Task 1 - Directory Structures
+		-----------------------------
+
+			Create a script called 't1.sh' that will build the following directory structures and files:
+				/home/user001/	directory1/	directory2/
+
+				/home/user001/	directory1/	directory3/	file1
+				/home/user001/	directory1/	directory3/	file2
+
+				/home/user001/	directory1/	directory3/	directory4/	file3
+				/home/user001/	directory1/	directory3/	directory4/	file4
+				/home/user001/	directory1/	directory3/	directory4/	file5
+				/home/user001/	directory1/	directory3/	directory4/	file6
+
+				/home/user001/	directory1/	directory5/	file7
+				/home/user001/	directory1/	directory5/	file8
+
+				/home/user001/	file9
+
+		Task 2 - Renaming Structure
+		---------------------------
+
+			Create a script called 't2.sh' that will rename the directories and files made in Task 1, ensuring all names are lower case, to:
+				/home/user001/	assessment/	commands/
+
+				/home/user001/	assessment/	data/	input
+				/home/user001/	assessment/	data/	output
+
+				/home/user001/	assessment/	data/	fb/	fb_output
+				/home/user001/	assessment/	data/	fb/	fizz
+				/home/user001/	assessment/	data/	fb/	buzz
+				/home/user001/	assessment/	data/	fb/	fizzbuzz
+
+				/home/user001/	assessment/	logs/	errorlog
+				/home/user001/	assessment/	logs/	executionlog
+
+				/home/user001/	assessment/	info
+
+		Task 3 - Update info
+		--------------------
+
+			Create a script called 't3.sh' that will add the following information:
+				Name: <your full name>
+				Email: <your full email>
+				Date: <todays date and time>
+			in to the file:
+				/home/user001/assessment/info
+
+		Task 4 - Update PATH and permissions
+		------------------------------------
+
+			Create a script called 't4.sh' that will update the PATH variable to include the directory:
+				'/home/user001/assessment/commands/'
+			't4.sh' should also create a file called 'fizzbuzz' inside:
+				'/home/user001/assessment/commands/' 
+			't4.sh' should, finally, update 'fizzbuzz' permissions to allow it to be executed by anyone.
+
+		Task 5 - FizzBuzz Basic
+		-----------------------
+
+			Update 'fizzbuzz' to satisfy the following:
+				-	Implement an array, which will hold values from 1 to 100. 
+				-	From here, loop through all items in the array. 
+				-	If a number divides by 3, echo “Fizz!”. 
+				-	If the number divides by 5, echo “Buzz!”. 
+				-	If the number divides by both 3 and 5, echo "FizzBuzz!".
+				-	If a number is not divisible by either 3 or 5, echo the number.
+
+			HINT: you should be able to execute 'fizzbuzz' from anywhere in the command line, as a result of editting the PATH variable in task 3.
+
+		Task 6 - Execution and Logs
+		---------------------------
+
+			Create a script called 't6.sh' that will:
+				-	Change the system options to prevent overwriting files.
+				-	Execute 'fizzbuzz', but instead of defaulting the output of 'fizzbuzz' to the terminal, output (overwrite not append) to the file:
+						/home/user001/assessment/data/fb/fb_output
+				-	Also, output to the file:
+						/home/user001/assessment/logs/executionlog
+					with the message:
+						<date and time> : fizzbuzz executed
+
+		Task 7 - FizzBuzz Advanced
+		--------------------------
+
+			Update 'fizzbuzz' to satisfy the following:
+				-	Always output to the file:
+						/home/user001/assessment/logs/executionlog
+					with the message:
+						<date and time> : fizzbuzz executed
+				-	Wrap the general 'FizzBuzz' logic, and the new executionlog update, in a method called 'fizzybuzzy'.
+
+			HINT: The following updates should NOT be within the 'fizzybuzzy' method:
+
+				-	Implement a loop to analyse all arguments passed to the script.
+				-	Implement conditional checks on the passed arguments:
+					-	If a non-numeric argument is passed, output (append) the argument to:
+							/home/user001/assessment/logs/errorlog
+						with the message:
+							<date and time> : <the argument passed> is not a numeric value
+					-	If a numeric argument is passed, AND the argument satisfies the 'fizzybuzzy' method, output (append) the argument to:
+							/home/user001/assessment/data/output
+						with the message:
+							<date and time> : <the argument passed> is a <Fizz!/Buzz!/FizzBuzz!> number
+					-	If a numeric argument is passed, AND the argument does NOT satisfy the 'fizzybuzzy' method, output (append) the argument to:
+							/home/user001/assessment/data/output
+						with the message:
+							<date and time> : <the argument passed> is not a FizzBuzz number
+
+		Task 8 - Passing Arguments
+		--------------------------
+
+			Create a script called 't8.sh' that will satisfy the following:
+				-	Execute the command 'fizzbuzz' (the script created in Task 5) with the following arguments (passed all at once):
+					-	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 42 99 100 non-numeric-arg
+				HINT: If the previous tasks were completed correctly, the arguments should be saved in to the errorlog or putput files
+				-	Search through the file
+						/home/user001/assessment/data/output
+				-	If the line contains "Fizz", append that line to
+						/home/user001/assessment/data/fb/fizz
+				-	If the line contains "Buzz", append that line to
+						/home/user001/assessment/data/fb/buzz
+				-	If the line contains "Fizz" and the line contains "Buzz", also append that line to
+						/home/user001/assessment/data/fb/fizzbuzz
+
+
+	SYSADMIN
+	--------
+
+		Task 1 - xyz
+		------------
+			abc
+
+		Task 2 - xyz
+		------------
+			abc
+
+		Task 3 - xyz
+		------------
+			abc
+
+		Task 4 - xyz
+		------------
+			abc
