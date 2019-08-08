@@ -27,12 +27,19 @@ File name shorthands
 	[a-z]	-> a character between A and Z
 	[!abc]	-> any character but a, b, and c
 Shell character classes (in ksh and bash)
-	[[:alnum:]] "alnum" can be changed to alpha, digit, lower, upper, punct, lower
+	[[:alnum:]] "alnum" can be changed to alpha, digit, lower, upper, punct
 
 Scripts
 	Log_file=mylog1			no spaces around "="
-	echo $Log_file			prints variable content
+	echo ${Log_file}		prints variable content
 	echo $(uname -r)		prints (executed thanks to brakets) command content
+	if (( ${x} % 2 == 0 ))	if [ ${str1} == ${str2} ]	if [ ${x} -gt ${y} ]
+	case word in
+		pattern )
+			;;
+	esac
+	for i in "${array[@]}"	for i in seq(1,${max})
+	while [ condition ]
 
 Permisions
 	type user group other
