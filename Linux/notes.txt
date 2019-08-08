@@ -52,6 +52,7 @@ Scripts
 	Log_file=mylog1				no spaces around "="
 	${#varName}					length of variable
 	declare -a arrayVar=(1,2)	create array variable 
+	echo ${arrayVar[*]}
 	echo ${Log_file}			prints variable content
 	echo $(uname -r)			prints (executed thanks to brakets) command content
 	if (( ${x} % 2 == 0 ))	if [ ${str1} == ${str2} ]	if [ ${x} -gt ${y} ]
@@ -60,7 +61,7 @@ Scripts
 				 anotherThingToDo;;
 		*)		 defaultThingToDo;;
 	esac
-	for i in "${array[@]}"	for i in seq(1,${max})	for i in $@
+	for i in ${array[@]}	for i in seq(1,${max})	for i in $@
 	while [ condition ]
 
 Permisions
