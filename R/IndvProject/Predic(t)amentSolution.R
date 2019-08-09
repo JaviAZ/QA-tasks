@@ -106,6 +106,7 @@ normaliseData <- function(dat){
 }
 
 #Design UI
+#dash board
 ui <- fluidPage(
   titlePanel("Predic(t)ament!"),
   sidebarPanel(
