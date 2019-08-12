@@ -1,3 +1,13 @@
+#' Install and import necessary libraries and import dataset from SQL
+#' 
+#' sample description
+#' sample2
+#' @param NA
+#' no parameters needed
+#' @return The train dataset
+#' @examples 
+#' trainData <- importLibrariesAndDB()
+#' @export
 importLibrariesAndDB <- function (){
   required_packages <- c('rattle','rpart.plot','RColorBrewer','kknn','RMariaDB','shiny','plyr') #Every package your script needs
   new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])] #Get all the ones not already installed
