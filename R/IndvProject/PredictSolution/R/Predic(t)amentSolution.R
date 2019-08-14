@@ -1,21 +1,22 @@
 #' Install and import necessary libraries and import dataset from SQL
-#' 
-#' sample description
-#' sample2
+#'
+#' This function contains a list of necessary libraries for the application to run
+#' it checks if the libraries are already installed, if they arents it proceeds to installation.
+#' Then it imports each library, connects to a local database to extract the data for the data set
+#' and returns the dataset with the train data.
 #' @param NA
 #' no parameters needed
-#' @return The train dataset
-#' @examples 
+#' @return The training dataset
+#' @examples
 #' trainData <- importLibrariesAndDB()
 #' @export
 importLibrariesAndDB <- function (){
-  required_packages <- c('rattle','rpart.plot','RColorBrewer','kknn','RMariaDB','shiny','plyr') #Every package your script needs
+  required_packages <- c('rpart.plot','RColorBrewer','kknn','RMariaDB','shiny','plyr') #Every package your script needs
   new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])] #Get all the ones not already installed
   if(length(new_packages >= 1)){
     install.packages(new_packages) #Install all packages not already installed
   }
   library(rpart)
-  library(rattle)
   library (rpart.plot)
   library(RColorBrewer)
   library(class)
@@ -23,20 +24,34 @@ importLibrariesAndDB <- function (){
   library(RMariaDB)
   library(shiny)
   library (plyr)
+  #Variables for connection to database
+  dbName <- "predictamentdb"
+  tableName <- "train_data"
+  localusername <- "root"
+  localuserpassword <- "root" #Change to "password" for GCP
   #Connecting to the database to get the data frame
-  localuserpassword <- "root"
-  PredictamentDB <- dbConnect(RMariaDB::MariaDB(), user='root', password=localuserpassword, dbname='predictamentdb', host='localhost')
+  PredictamentDB <- dbConnect(RMariaDB::MariaDB(), user=localusername, password=localuserpassword, dbname=dbName, host='localhost')
   dbListTables(PredictamentDB)
-  query <- "SELECT * FROM train_data;"
+  query <- paste("SELECT * FROM ", tableName,";", sep="")
   allData <- dbFetch(dbSendQuery(PredictamentDB, query))
   dbDisconnect(PredictamentDB)
   return(allData)
 }
+
 #To stop program from printing numbers in scientific notation
 options(scipen=999)
 
-#For database clean: Clean data with string factors and turn them into numeric values
-#For UI input clean: Clean input from user friendly words to string factor and then into numeric values
+#' Clean data in certain columns
+#'
+#' This function will do slightly different things depending on the parameters, if it is called with the
+#' UI input, it will normalise the "user friendly" words into string factors and then change this factors
+#' into numeric values. Otherwise, it will be called with the whole train data which will normalise the
+#' string factors into numeric values.
+#' @param dataset
+#' Train data or GUI input
+#' @return Cleaned dataset
+#' @examples
+#' trainClean <- cleanData(trainData)
 cleanData <- function(dat){
   if(length(dat) == 81){
     dat$CentralAir<- factor(dat$CentralAir, levels = c("N","Y"), labels = c(0,1), ordered = TRUE)
@@ -75,12 +90,20 @@ cleanData <- function(dat){
   dat$ExterQual<- factor(dat$ExterQual, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
   dat$BsmtQual<- factor(dat$BsmtQual, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
   dat$KitchenQual<- factor(dat$KitchenQual, levels = c("Po","Fa","TA","Gd","Ex"), labels = c(1,2,3,4,5), ordered = TRUE)
-  
-  
+
+
   return(dat)
 }
 
-#Calculates R, P and F values for each column and outputs it into a CSV to be able to compare which columns affect the sale price the most
+#' Export R values, P values and F values for each column into a CSV
+#'
+#' This functionCalculates R values, P values and F values for each column and export these into a CSV
+#' to be able to compare which columns affect the sale price the most to then be used in the prediction
+#' @param NA
+#' no parameters needed
+#' @return No value returned
+#' @example
+#' ExportRPFVals()
 ExportRPFVals <- function(){
   names <- c()
   rVals <- c()
@@ -94,18 +117,33 @@ ExportRPFVals <- function(){
     pVals <- c(pVals, as.numeric(anova(mdl)$`Pr(>F)`[1]))
     fVals <- c(fVals, as.numeric(summ$fstatistic[1]))
   }
-  
+
   d <- data.frame(names,rVals,pVals,fVals)
   write.csv(d, file="databaseRPFVals.csv")
 }
 
-#Feature Scalling function
+#' Feature Scalling function
+#'
+#' This function takes in string or numeric values and formats them into a number between 0 and 1
+#' @param DatasetColumn
+#' Takes in a column using lapply
+#' @return List of numeric values between 0-1
+#' @example
+#' lapply(allData[,2:length(allData)], FeatureScalling)
 FeatureScalling <- function(x) {
   x <- as.numeric(x)
-  return((x-min(x))/(max(x)-min(x))) 
+  return((x-min(x))/(max(x)-min(x)))
 }
 
-#Create a subset of the data frame with only the relevant columns and get rid off NA values
+#' Normalise train dataset to use only relevant columns and rows
+#'
+#' This function creates a subset of the data frame with pre-selected columns and removes rows with
+#' NA values
+#' @param Dataset
+#' Takes in the train dataset
+#' @return Normalised dataset
+#' @example
+#' dataNormalised <- normaliseData(trainData)
 normaliseData <- function(dat){
   #Normalise Data
   Dat_Normalised <- subset(dat, select=c(SalePrice,OverallQual,GrLivArea,ExterQual,KitchenQual,BsmtQual,GarageCars,TotalBsmtSF,X1stFlrSF,FullBath,TotRmsAbvGrd,YearBuilt))
@@ -115,48 +153,32 @@ normaliseData <- function(dat){
   return(Dat_Normalised)
 }
 
-#Design UI
-#dash board
-ui <- fluidPage(
-  titlePanel("Predic(t)ament!"),
-  sidebarPanel(
-    fluidRow(
-      column(2,
-             sliderInput(inputId = "OverallQual", label = "Overal Quality",min = 0, max = 10, value = 5)),
-      column(2,
-             selectInput(inputId = "ExterQual", label = "Exterior Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
-      column(3,
-             selectInput(inputId = "KitchenQual", label = "Kitchen Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
-      column(3,
-             selectInput(inputId = "BsmtQual", label = "Basement Quality", choices = c("Excellent","Good","Typical","Fair","Poor","No Basement")))
-    ),
-    fluidRow(
-      column(3,
-             textInput(inputId = "GrLivArea", label = "Above ground living area square feet", value = 2423)),
-      column(3,
-             textInput(inputId = "TotalBsmtSF", label = "Basement area square feet", value = 1234)),
-      column(3,
-             textInput(inputId = "X1stFlrSF", label = "1st floor area square feet", value = 1342)),
-      column(3,
-             textInput(inputId = "YearBuilt", label = "Original construction date", value = 1997))
-    ),
-    fluidRow(
-      column(3,
-             sliderInput(inputId = "GarageCars", label = "Garage car capacity",min = 0, max = 10, value = 2)),
-      column(3,
-             sliderInput(inputId = "FullBath", label = "Bathrooms above ground",min = 0, max = 10, value = 2)),
-      column(3,
-             sliderInput(inputId = "TotRmsAbvGrd", label = "Rooms above ground (not including bathrooms",min = 1, max = 20, value = 0))
-    ),
-    width = 20),
-  mainPanel(
-    textOutput(outputId = "Predicted"),
-    submitButton("Check price")
-  )
-)
+#' Weighted K-Nearest Neighbor model
+#'
+#' This function calculates a k value and trains a weighted knn model with the train data
+#' @param NA
+#' no parameters needed
+#' @return Weighted K-Nearest Neighbor model
+#' @example
+#' knnModel <- weightedKNNModel()
+weightedKNNModel <- function(){
+  #Compute k-value to use with the classifier. Rule of thumb is square root of n of observations
+  k_value <- floor(sqrt(length(allData_Normalised[,1])))
+  trainingData <- allData_Normalised[,]
+  model <- train.kknn(formula = SalePrice~., data=trainingData, kmax = k_value, kernel = "optimal")
+  return(model)
+}
 
-#Takes input from UI and predicts a sale price based on a weighted KNN model 
-cleverCleverLogic <- function(input){
+#' Weighted K-Nearest Neighbor prediction
+#'
+#' This function calculates a sale price prediction based on a previously trained K-Nearest Neighbormodel and
+#' the user input
+#' @param list
+#' List with user inputs from UI
+#' @return Predicted sale price rounded to the nearest thousand
+#' @example
+#' weightedKNNPredict(input)
+weightedKNNPredict <- function(input){
   #inp <- list("OverallQual"=6,"GrLivArea"=1800,"ExterQual"="Excellent","KitchenQual"="Good","BsmtQual"="Good","GarageCars"=2,
   #            "TotalBsmtSF"=800,"X1stFlrSF"=800,"FullBath"=2,"TotRmsAbvGrd"=5,"YearBuilt"=1997)
   inp <- list("OverallQual"=input$OverallQual,"GrLivArea"=as.numeric(input$GrLivArea),"ExterQual"=input$ExterQual,
@@ -164,25 +186,62 @@ cleverCleverLogic <- function(input){
               "TotalBsmtSF"=as.numeric(input$TotalBsmtSF),"X1stFlrSF"=as.numeric(input$X1stFlrSF),
               "FullBath"=as.numeric(input$FullBath),"TotRmsAbvGrd"=as.numeric(input$TotRmsAbvGrd),
               "YearBuilt"=as.numeric(input$YearBuilt))
-  #Compute k-value to use with the classifier. Rule of thumb is square root of n of observations
-  k_value <- floor(sqrt(length(allData_Normalised[,1])))
-  #Split data into testing and training data
+
+  #Clean input
   testingData <- data.frame(inp)
   testingData <- cleanData(testingData)
-  trainingData <- allData_Normalised[,]
   #Train weighted KNN Algorithm and test against testing results
-  model <- train.kknn(formula = SalePrice~., data=trainingData, kmax = k_value, kernel = "optimal")
-  predicty <- predict(model, testingData)
+  predicty <- predict(knnModel, testingData)
   return(round(predicty,-3))
 }
 
+#Design UI
+ui <- shiny::fluidPage(
+  shiny::titlePanel("Predic(t)ament!"),
+  shiny::sidebarPanel(
+    shiny::fluidRow(
+      shiny::column(2,
+             shiny::sliderInput(inputId = "OverallQual", label = "Overal Quality",min = 0, max = 10, value = 5)),
+      shiny:: column(2,
+             shiny::selectInput(inputId = "ExterQual", label = "Exterior Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
+      shiny::column(3,
+             shiny::selectInput(inputId = "KitchenQual", label = "Kitchen Quality", choices = c("Excellent","Good","Average","Fair","Poor"))),
+      shiny::column(3,
+             shiny::selectInput(inputId = "BsmtQual", label = "Basement Quality", choices = c("Excellent","Good","Typical","Fair","Poor","No Basement")))
+    ),
+    shiny::fluidRow(
+      shiny::column(3,
+             shiny::textInput(inputId = "GrLivArea", label = "Above ground living area square feet", value = 2423)),
+      shiny::column(3,
+             shiny::textInput(inputId = "TotalBsmtSF", label = "Basement area square feet", value = 1234)),
+      shiny::column(3,
+             shiny::textInput(inputId = "X1stFlrSF", label = "1st floor area square feet", value = 1342)),
+      shiny::column(3,
+             shiny::textInput(inputId = "YearBuilt", label = "Original construction date", value = 1997))
+    ),
+    shiny::fluidRow(
+      shiny::column(3,
+             shiny::sliderInput(inputId = "GarageCars", label = "Garage car capacity",min = 0, max = 10, value = 2)),
+      shiny::column(3,
+             shiny::sliderInput(inputId = "FullBath", label = "Bathrooms above ground",min = 0, max = 10, value = 2)),
+      shiny::column(3,
+             shiny::sliderInput(inputId = "TotRmsAbvGrd", label = "Rooms above ground (not including bathrooms",min = 1, max = 20, value = 0))
+    ),
+    width = 20),
+  shiny::mainPanel(
+    shiny::textOutput(outputId = "Predicted"),
+    shiny::submitButton("Check price")
+  )
+)
+
 server <- function(input,output){
   output$Predicted <- renderText({
-    paste("Predicted Value of \U00A3", cleverCleverLogic(input))
+    paste("Predicted Value of \U00A3", weightedKNNPredict(input))
   })
 }
 
 allData <- importLibrariesAndDB()
 allData <- cleanData(allData)
 allData_Normalised <- normaliseData(allData)
+knnModel <- weightedKNNModel()
 shinyApp(ui = ui, server = server)

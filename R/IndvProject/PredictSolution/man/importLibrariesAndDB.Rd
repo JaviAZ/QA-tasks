@@ -10,11 +10,13 @@ importLibrariesAndDB()
 \item{NA}{no parameters needed}
 }
 \value{
-The train dataset
+The training dataset
 }
 \description{
-sample description
-sample2
+This function contains a list of necessary libraries for the application to run
+it checks if the libraries are already installed, if they arents it proceeds to installation.
+Then it imports each library, connects to a local database to extract the data for the data set
+and returns the dataset with the train data.
 }
 \examples{
 trainData <- importLibrariesAndDB()
