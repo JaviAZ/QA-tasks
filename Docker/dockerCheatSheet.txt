@@ -1,0 +1,24 @@
+Install docker in new vm
+	1  sudo apt-get update
+    2  sudo apt-get upgrade
+    3  sudo apt install tree
+    4  curl https://get.docker.com | sudo bash
+    5  sudo usermod -aG docker $(whoami)
+    6  restart console
+
+Create Dockerfile
+	sudo nano Dockerfile
+build app
+	without arguement
+		docker build -t docker.io/javiaz/py_app:latest .
+	with arguement
+		docker build --build-arg [VARNAME]=[VALUE] -t docker.io/javiaz/py_app:latest .
+run image in container publishing port 80
+	docker run -d -p 80:80 javiaz/py_app
+stop and remove all containers
+	docker stop $(docker ps -qa)
+	docker rm $(docker ps -qa)
+View images
+	docker images
+View all processes 
+	docker ps -a
