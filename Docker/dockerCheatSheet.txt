@@ -22,3 +22,53 @@ View images
 	docker images
 View all processes 
 	docker ps -a
+
+docker network
+				create
+				rm
+				list
+		run -d --network test nginx
+	   inspect networkname
+jenkins network pass
+	docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+	docker logs jenkins
+change tag
+	docker tag oldname newname
+Create an NGINX container with the volume mounted to /usr/share/nginx/html in the container. Make
+sure that you publish the port (80) 
+	docker run -d -p 80:80 --mount source=webpage,destination=/usr/share/nginx/html nginx
+
+log into container
+	docker exec -it containername bash
+
+docker databases
+	docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=dbname --network dbname mysql:5.7
+
+
+
+FLASK APP
+	docker network create [net name]
+	git clone [Flask app git repo]
+	cd [folder of repo just cloned]
+	[edit application/__init__.py SQL connection to: 'mysql+pymysql://root:password@mysql:3306/[net name]']
+	sudo nano Dockerfile
+		>FROM python:3.5.7
+		>WORKDIR /application
+		>RUN apt-get update
+		>RUN pip3 install [py library]==[version]
+		>...
+		>RUN pip3 install virtualenv
+		>RUN python -m virtualenv venv
+		>ENV FLASK_APP=run.py
+		>ENV FLASK_ENV=production
+		>COPY . .
+		>ENTRYPOINT ["/usr/local/bin/flask", "run", "--host=0.0.0.0"]
+	sudo nano create.py
+		>from application import db
+		>db.drop_all()
+		>from application.models import Users, Posts
+		>db.create_all()
+	docker build -t [dockerhub repo]/[app name] .
+	docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=[net name] --network [net name] mysql:5.7
+	docker run -d -p 5000:5000 --name app --network flask_app javiaz/simple_flask_app
+	docker exec app python create.py
