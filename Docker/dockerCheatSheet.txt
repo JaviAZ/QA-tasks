@@ -1,10 +1,12 @@
-Install docker in new vm
+Install docker and docker-compose in new vm
 	1  sudo apt-get update
     2  sudo apt-get upgrade
     3  sudo apt install tree
-    4  curl https://get.docker.com | sudo bash
+    4  curl https://get.docker.com | sudo bash 
     5  sudo usermod -aG docker $(whoami)
-    6  restart console
+    6  sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    7  sudo chmod +x /usr/local/bin/docker-compose
+    8  restart console
 
 Create Dockerfile
 	sudo nano Dockerfile
@@ -72,3 +74,29 @@ FLASK APP
 	docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=[net name] --network [net name] mysql:5.7
 	docker run -d -p 5000:5000 --name app --network flask_app javiaz/simple_flask_app
 	docker exec app python create.py
+
+
+
+docker-compose
+build container
+	docker-compose up -d
+build container with copies
+	docker-compose up -d --scale [appname]=[number of containers]
+stop containers and remove images
+	docker-compose down --rmi all
+app versions
+	export APP_VERSION=v1
+change to new version
+	export APP_VERSION=v2
+	docker-compose build --no-cache app
+	docker-compose up -d app
+
+
+docker in jenkins container
+	docker exec -u root -it containername bash
+	curl https://get.docker.com | sudo bash 
+	usermod -aG docker jenkins
+	 curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+    exit
+    docker restart containername
