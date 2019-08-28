@@ -1,0 +1,45 @@
+Installation
+	curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+Login
+	az login passwordPassword*2
+
+Resource groups
+	Create group: 		az group create --name [RESOURCE_GROUP_NAME] --location [LOCATION]
+	Default location:   az configure --defaults location=[DEFAULT_LOCATION]
+	Default group: 		az configure --defaults group=[DEFAULT_RESOURCE_GROUP]
+	Delete group: 		az group delete --name [RESOURCE_GROUP_NAME] --yes --no-wait
+
+Networks
+	Create network:		az network vnet create --resource-group [RESOURCE_GROUP] --name [VNET_NAME]
+	Address prefix:		az network vnet create --resource-group [RESOURCE_GROUP] --name [VNET_NAME] --address-prefixes [ADDRESS_PREFIX]
+	Delete network: 	az network vnet delete --resource-group [RESOURCE_GROUP] --name [VNET _NAME]
+
+ ---Subnets
+	Create subnet: 		az network vnet create --resource-group [RESOURCE_GROUP] --name [VNET_NAME] --subnet-name [SUBNET_NAME] --subnet-prefix [SUBNET_PREFIX]
+	Delete subnet:		az network vnet subnet delete --resource-group [RESOURCE_GROUP] --vnet-name [VIRTUAL_NETWORK_NAME] --name [SUBNET_NAME]
+
+ ---Network Security Group
+ 	Create NSG:		az network nsg create --resource-group [RESOURCE_GROUP] --name [NSG_NAME]
+ 	Create rule:	az network nsg rule create --resource-group [RESOURCE_GROUP] --name [RULE_NAME] --priority [PRIORITY] --nsg-name [NSG_NAME]
+ 	Add port:	az network nsg rule create --resource-group [RESOURCE_GROUP] --name [RULE_NAME] --priority [PRIORITY] --nsg-name [NSG_NAME] --destination-port-ranges [DESITNATION_PORT_RANGES]	
+	Delete NSG:		az network nsg delete --resource-group [RESOURCE_GROUP] --name [NSG_NAME] 	
+
+ ---Public IP
+ 	Create IP:			az network public-ip create --resource-group [RESOURCE_GROUP] --name [PUBLIC_IP_NAME]
+ 	Create DNS:			az network public-ip create --resource-group [RESOURCE_GROUP] --name [PUBLIC_IP_NAME] --dns-name [DNS_NAME]
+ 	Create IP static:	az network public-ip create --resource-group [RESOURCE_GROUP] --name [PUBLIC_IP_NAME] --allocation-method [ALLOCATION_METHOD]
+ 	Delete IP:			az network public-ip delete--resource-group [RESOURCE_GROUP] --name [PUBLIC_IP_NAME]
+
+ ---Network Interface Cards
+ 	Create NIC:		az network nic create --resource-group [RESOURCE_GROUP_NAME] --name [NETWORK_INTERFACE_NAME] --vnet-name [VIRTUAL_NETWORK_NAME] --subnet [SUBNET_NAME]
+ 	NIC w/ NSG:		az network nic create --resource-group [RESOURCE_GROUP_NAME] --name [NETWORK_INTERFACE_NAME] --vnet-name [VIRTUAL_NETWORK_NAME] --subnet [SUBNET_NAME] --network-security-group [NETWORK_SECURITY_GROUP_NAME]
+ 	NIC w/ IP:		az network nic create --resource-group [RESOURCE_GROUP_NAME] --name [NETWORK_INTERFACE_NAME] --vnet-name [VIRTUAL_NETWORK_NAME] --subnet [SUBNET_NAME] --public-ip-address [PUBLIC_IP_ADDRESS_NAME]
+ 	Delete NIC:		az network nic delete --resource-group [RESOURCE_GROUP_NAME] --name [NETWORK_INTERFACE_NAME]
+
+Virtual Machines
+	List images:	az vm image list -o table
+	Create VM: 		az vm create --resource-group [RESOURCE_GROUP_NAME] --name [VIRTUAL_MACHINE_NAME] --image [IMAGE_URN]  --generate-ssh-keys
+	VM w/ NIC:		az vm create --resource-group [RESOURCE_GROUP_NAME] --name [VIRTUAL_MACHINE_NAME] --image [IMAGE_URN] --nics [NETWORK_INTERFACES]
+	Find VM IP:		az vm list-ip-addresses
+	Delete VM:		az vm delete --resource-group [RESOURCE_GROUP_NAME] --name [VIRTUAL_MACHINE_NAME]
