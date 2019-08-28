@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+<style>
+	div.form-group{
+		padding-bottom: 20px;
+	}
+</style>
+{% block body_content %}
+{% if post %}
+		<div>
+			<h3>{{ post.title }}</h3>
+			<span>by <i> {{ post.author.first_name }} {{ post.author.last_name }}</i>,</span>
+			<span>on the <i>{{ post.date_posted }}</i></span>
+			{% if post.author.id == current_user.id %}
+				<form method='POST', action=''>
+					{{ form.csrf_token }}
+					
+					<div class='form-group'>
+						{{ form.content.label }}
+						{{ form.content }}
+						{% if form.content.errors %}
+							<div class='error'>
+								{% for error in form.content.errors %}
+									<span>{{ error }}</span>
+								{% endfor %}
+							</div>
+						{% endif %}
+					</div>
+						{{ form.submit }}
+				</form>
+			{% endif %}
+		</div>
+
+{% else %}
+	<div class='form', align='center', style='padding-top: 50px;'>
+		<form method='POST', action=''>
+			{{ form.csrf_token }}
+			<div class='form-group'>
+				{{ form.title.label }}
+				{{ form.title }}
+				{% if form.title.errors %}
+					<div class='error'>
+						{% for error in form.title.errors %}
+							<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% endif %}
+			</div>
+			<br>
+			<div class='form-group'>
+				{{ form.content.label }}
+				{{ form.content }}
+				{% if form.content.errors %}
+					<div class='error'>
+						{% for error in form.content.errors %}
+							<span>{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% endif %}
+			</div>
+			<br>
+			{{ form.submit }}
+		</form>
+	</div>
+{% endif %}
+{% endblock body_content %}

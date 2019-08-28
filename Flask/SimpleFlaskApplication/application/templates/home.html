@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body_content %}
+	<h1>Home Page </h1>
+	<p>Welcome to this web app!</p>
+	{% for post in posts %}
+		<div>
+			<h3><a href='/post&{{ post.id }}'>{{ post.title }}</a></h3>
+			<span>by <i> {{ post.author.first_name }} {{ post.author.last_name }}</i>,</span>
+			<span>on the <i>{{ post.date_posted }}</i></span>
+			<p>{% if post.content|length < 500 %} {{ post.content }} {% else%} {{ post.content[0:500] }}...[Click on name to see more] {% endif %}</p>
+		</div>
+	{% endfor %}
+{% endblock body_content %}
